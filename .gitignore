@@ -1,0 +1,8 @@
+*.txt
+
+Arene_light
+CMakeFiles/*
+joueurs/CMakeFiles/
+joueurs/Makefile
+*.cmake
+*.a
