@@ -3,6 +3,6 @@
 Arene_light
 CMakeFiles/*
 joueurs/CMakeFiles/
-joueurs/Makefile
+*Makefile
 *.cmake
 *.a
