@@ -1,8 +1,10 @@
 *.txt
 
-Arene_light
-CMakeFiles/*
-joueurs/CMakeFiles/
+*Arene_light
+*CMakeFiles
+*joueurs/CMakeFiles/
 *Makefile
 *.cmake
 *.a
+*.out
+*.bin
