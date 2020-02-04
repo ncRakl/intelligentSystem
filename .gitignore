@@ -1,5 +1,5 @@
 *.txt
-
+*.gch
 *Arene_light
 *CMakeFiles
 *joueurs/CMakeFiles/
@@ -8,3 +8,4 @@
 *.a
 *.out
 *.bin
+ticTacToeOUT

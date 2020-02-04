@@ -131,7 +131,7 @@ thread_joueur.detach();
 	    }
 	}
 
-      _jeu.joue(_coups[_numero_partie-1]);
+      _jeu.joue(_coups[_numero_partie-1], tour%2);
       std::cout << ((tour%2) ? _joueur1->nom_abbrege() : _joueur2->nom_abbrege()) << _coups[_numero_partie-1] << " " << _jeu.etat() << " ";
       
     }
