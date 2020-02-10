@@ -12,6 +12,7 @@
 #include "joueurs/joueur_random.h"
 #include "joueurs/joueur_brutal_.h"
 #include "joueurs/joueur_alphabeta_.h"
+#include "joueurs/joueur_alphabeta_OLD_.h"
 
 #define TEMPS_POUR_UN_COUP 100 // millisecondes
 
@@ -21,7 +22,7 @@
  *             dans les temps                                                     *
  **********************************************************************************/
 
-enum class player {A_ , BRUTAL_ , RAND } ;
+enum class player {A_ , A_OLD_ , BRUTAL_ , RAND } ;
 
 /**
  * @brief The Arbitre class

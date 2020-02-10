@@ -22,7 +22,7 @@ void Arbitre::initialisation()
 
     switch ((_numero_partie%2? _player1 : _player2)) {
     case player::A_:
-      _joueur1 = std::make_shared<Joueur_AlphaBeta_> ("AlphaBeta",true);
+        _joueur1 = std::make_shared<Joueur_AlphaBeta_> ("AlphaBeta",true);
         break;
     case player::BRUTAL_:
         _joueur1 = std::make_shared<Joueur_Brutal_> ("Brutal",true);
@@ -30,19 +30,25 @@ void Arbitre::initialisation()
     case player::RAND:
         _joueur1 = std::make_shared<Joueur_Random> ("Random",true);
         break;
+    case player::A_OLD_:
+        _joueur1 = std::make_shared<Joueur_AlphaBeta_OLD_> ("AlphaBetaOLD",true);
+        break;
     default:
         break;
     }
 
     switch ((!(_numero_partie%2)? _player1 : _player2)) {
     case player::A_:
-              _joueur2 = std::make_shared<Joueur_AlphaBeta_> ("AlphaBeta",false);
+        _joueur2 = std::make_shared<Joueur_AlphaBeta_> ("AlphaBeta",false);
         break;
     case player::BRUTAL_:
         _joueur2 = std::make_shared<Joueur_Brutal_> ("Brutal",false);
         break;
     case player::RAND:
         _joueur2 = std::make_shared<Joueur_Random> ("Random",false);
+        break;
+    case player::A_OLD_:
+        _joueur2 = std::make_shared<Joueur_AlphaBeta_OLD_> ("AlphaBetaOLD",false);
         break;
     default:
         break;
@@ -82,61 +88,63 @@ void Arbitre::challenge()
 
 int Arbitre::partie()
 {
-  int tour = 0;
+    int tour = 0;
 
-  while(!_jeu.fini())
+    while(!_jeu.fini())
     {
-      bool try_lock = false;
-      tour++;
+        bool try_lock = false;
+        tour++;
       
-      _coups[_numero_partie-1] = -1;
-      _coups_mutex[_numero_partie-1].unlock();
+        _coups[_numero_partie-1] = -1;
+        _coups_mutex[_numero_partie-1].unlock();
       
-      std::thread thread_joueur(&Joueur::jouer,
+        std::thread thread_joueur(&Joueur::jouer,
 				((tour%2)? (_joueur1) :(_joueur2) ),
 				_jeu,
 				std::ref(_coups[_numero_partie-1]),
-				std::ref(_coups_mutex[_numero_partie-1]));
+				std::ref(_coups_mutex[_numero_partie-1]),
+        tour);
       
-      std::this_thread::sleep_for (std::chrono::milliseconds(TEMPS_POUR_UN_COUP));
-      //        std::this_thread::sleep_for (std::chrono::seconds(TEMPS_POUR_UN_COUP));
+        std::this_thread::sleep_for (std::chrono::milliseconds(TEMPS_POUR_UN_COUP));
+        //        std::this_thread::sleep_for (std::chrono::seconds(TEMPS_POUR_UN_COUP));
       
-      if (!_coups_mutex[_numero_partie-1].try_lock()) {
-	std::cerr <<  std::endl << "mutex non rendu " << std::endl;
-	try_lock = true;
-      }
-      else if(_coups[_numero_partie-1] == -1) {
-	std::cerr << "coup invalide -1" << std::endl;
-      }
-      else if(!_jeu.coup_licite(_coups[_numero_partie-1])) {
-	std::cerr << "coup invalide " << _coups[_numero_partie-1] << std::endl;
-      }
+        if (!_coups_mutex[_numero_partie-1].try_lock())
+        {
+	       std::cerr <<  std::endl << "mutex non rendu " << std::endl;
+	       try_lock = true;
+        }
+        else if(_coups[_numero_partie-1] == -1)
+        {
+	       std::cerr << "coup invalide -1" << std::endl;
+        }
+        else if(!_jeu.coup_licite(_coups[_numero_partie-1]))
+        {
+	       std::cerr << "coup invalide " << _coups[_numero_partie-1] << std::endl;
+        }
 
-thread_joueur.detach();
+        thread_joueur.detach();
  
-      if(try_lock ||
-	 (_coups[_numero_partie-1] == -1) ||
-	 !_jeu.coup_licite(_coups[_numero_partie-1]))   
-	{
+        if(try_lock ||
+            (_coups[_numero_partie-1] == -1) ||
+            !_jeu.coup_licite(_coups[_numero_partie-1]))
+        {
+            if(tour%2)
+            {
+                std::cout << _joueur2->nom() <<" gagne ! Nombre de tours : " << tour << std::endl;  
+                return 2; // joueur 2 gagne
+            }
+            else
+            {
+                std::cout << _joueur1->nom() <<" gagne ! Nombre de tours : " << tour << std::endl;
+                return 1; // joueur 1 gagne
+            }
+        }
 
-	  if(tour%2)
-	    {
-	      std::cout << _joueur2->nom() <<" gagne ! Nombre de tours : " << tour << std::endl;  
-	      return 2; // joueur 2 gagne
-	    }
-	  else
-	    {
-	      std::cout << _joueur1->nom() <<" gagne ! Nombre de tours : " << tour << std::endl;
-	      return 1; // joueur 1 gagne
-	    }
-	}
-
-      _jeu.joue(_coups[_numero_partie-1], tour%2);
-      std::cout << ((tour%2) ? _joueur1->nom_abbrege() : _joueur2->nom_abbrege()) << _coups[_numero_partie-1] << " " << _jeu.etat() << " ";
-      
+        _jeu.joue(_coups[_numero_partie-1]);
+        std::cout << ((tour%2) ? _joueur1->nom_abbrege() : _joueur2->nom_abbrege()) << _coups[_numero_partie-1] << " " << _jeu.etat() << " ";
     }
 
-  std::cout << "\n"<< ((tour%2)? _joueur1->nom() : _joueur2->nom() )  <<" gagne. Nombre de tours : " << tour << std::endl;
-  return ((tour%2)? 1 : 2);
+    std::cout << "\n"<< ((tour%2)? _joueur1->nom() : _joueur2->nom() )  <<" gagne. Nombre de tours : " << tour << std::endl;
+    return ((tour%2)? 1 : 2);
 }
 

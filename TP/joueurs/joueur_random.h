@@ -17,6 +17,6 @@ public:
     char nom_abbrege() const override;
 
 
-    void recherche_coup(Jeu jeu, int & coup) override;
+    void recherche_coup(Jeu jeu, int & coup, int tour) override;
 };
 

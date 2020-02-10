@@ -10,7 +10,7 @@ char Joueur_Brutal_::nom_abbrege() const
     return 'B';
 }
 
-void Joueur_Brutal_::recherche_coup(Jeu jeu, int &coup)
+void Joueur_Brutal_::recherche_coup(Jeu jeu, int &coup, int tour)
 {
   //  std::this_thread::sleep_for (std::chrono::milliseconds(std::experimental::randint(0,11)));
   std::this_thread::sleep_for (std::chrono::milliseconds(rand() % 11));
